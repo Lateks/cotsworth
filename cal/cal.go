@@ -1,4 +1,4 @@
-package cotsworth
+package cal
 
 import (
 	"time"
