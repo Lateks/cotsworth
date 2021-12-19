@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/Lateks/cotsworth/cal"
 	fcalFmt "github.com/Lateks/cotsworth/fmt"
-	"log"
+	"math"
 	"strings"
 )
 
@@ -13,11 +13,42 @@ func displayMonth(monthDate *cal.IFCDate, highlightDate *cal.IFCDate) {
 	fmt.Println(strings.Join(monthLines, "\n"))
 }
 
+func displayMonthsOnLine(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IFCDate) {
+	if numMonths < 1 {
+		return
+	}
+	if numMonths == 1 {
+		displayMonth(startMonth, highlightDate)
+		return
+	}
+
+	months := make([][]string, numMonths)
+	month := startMonth
+	for m := 0; m < numMonths; m++ {
+		months[m] = fcalFmt.MonthToLines(month.Year, month.Month, highlightDate)
+		month = month.PlusMonths(1)
+	}
+
+	for i := 0; i < len(months[0]); i++ {
+		for j := 0; j < numMonths-1; j++ {
+			fmt.Print(months[j][i])
+		}
+		fmt.Println(months[numMonths-1][i])
+	}
+}
+
+const maxMonthsPerLine = 3
+
+func displayMonths(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IFCDate) {
+	for numMonths > 0 {
+		monthsToDisplay := int(math.Min(maxMonthsPerLine, float64(numMonths)))
+		displayMonthsOnLine(monthsToDisplay, startMonth, highlightDate)
+		startMonth = startMonth.PlusMonths(monthsToDisplay)
+		numMonths -= monthsToDisplay
+	}
+}
+
 func Execute(args []string) {
 	command := parseArgs(args)
-	if command.numMonths == 1 {
-		displayMonth(command.firstMonth, command.highlightDay)
-	} else {
-		log.Fatalf("Not implemented")
-	}
+	displayMonths(command.numMonths, command.firstMonth, command.highlightDay)
 }

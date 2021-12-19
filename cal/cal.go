@@ -51,6 +51,14 @@ func (m IFCMonth) String() string {
 	return LongMonthNames[int(m)-1]
 }
 
+func toIFCMonth(value int) IFCMonth {
+	return IFCMonth((value-1)%MonthsInYear + 1)
+}
+
+func (m IFCMonth) PlusMonths(months int) IFCMonth {
+	return toIFCMonth(int(m) + months)
+}
+
 type Weekday int
 
 const (
@@ -143,6 +151,24 @@ func (d *IFCDate) Weekday() Weekday {
 
 	weekday := (d.Day - 1) % DaysInWeek
 	return Weekday(weekday)
+}
+
+func (d *IFCDate) PlusMonths(months int) *IFCDate {
+	var day int
+	if d.Day == 29 {
+		day = 28
+	} else {
+		day = d.Day
+	}
+	month := d.Month.PlusMonths(months)
+
+	changeInYears := months / MonthsInYear
+	if (months % MonthsInYear) > MonthsInYear-int(d.Month) {
+		changeInYears++
+	}
+	year := d.Year + changeInYears
+
+	return NewIFCDate(year, month, day)
 }
 
 func DateAt(t time.Time) *IFCDate {

@@ -84,3 +84,47 @@ func TestWeekdays(t *testing.T) {
 		}
 	}
 }
+
+func TestAddMonthsToDate(t *testing.T) {
+	for i, input := range []struct {
+		ifcDate     *cal.IFCDate
+		monthsToAdd int
+		result      *cal.IFCDate
+	}{
+		{
+			cal.NewIFCDate(2020, cal.January, 1),
+			13,
+			cal.NewIFCDate(2021, cal.January, 1),
+		},
+		{
+			cal.NewIFCDate(2020, cal.Sol, 1),
+			13,
+			cal.NewIFCDate(2021, cal.Sol, 1),
+		},
+		{
+			cal.NewIFCDate(2021, cal.December, 1),
+			1,
+			cal.NewIFCDate(2022, cal.January, 1),
+		},
+		{
+			cal.NewIFCDate(2021, cal.December, 29),
+			1,
+			cal.NewIFCDate(2022, cal.January, 28),
+		},
+		{
+			cal.NewIFCDate(2020, cal.June, 29),
+			1,
+			cal.NewIFCDate(2020, cal.Sol, 28),
+		},
+		{
+			cal.NewIFCDate(2020, cal.December, 1),
+			0,
+			cal.NewIFCDate(2020, cal.December, 1),
+		},
+	} {
+		newDate := input.ifcDate.PlusMonths(input.monthsToAdd)
+		if !newDate.Equal(input.result) {
+			t.Errorf("%d: Expected %+v but found %+v\n", i, input.result, newDate)
+		}
+	}
+}

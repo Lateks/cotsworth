@@ -96,16 +96,30 @@ func parseArgs(args []string) *command {
 		}
 		return command
 	case 1:
+		today := cal.DateAt(time.Now())
+
+		// Try to parse argument as a year.
+		year, err := parseYear(args[0])
+		if err == nil {
+			date := cal.NewIFCDate(year, cal.January, 1)
+			command := &command{
+				numMonths:    cal.MonthsInYear,
+				firstMonth:   date,
+				highlightDay: today,
+			}
+			return command
+		}
+
+		// Failing that, assume it's a month.
 		month, err := parseMonth(args[0])
 		if err != nil {
 			logArgParseError(err, args[0])
 		}
-		year := time.Now().Year()
-		date := cal.NewIFCDate(year, month, 1)
+		date := cal.NewIFCDate(today.Year, month, 1)
 		command := &command{
 			numMonths:    1,
 			firstMonth:   date,
-			highlightDay: nil,
+			highlightDay: today,
 		}
 		return command
 	}
