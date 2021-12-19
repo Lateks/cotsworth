@@ -2,11 +2,16 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/Lateks/cotsworth/cal"
-	fcalFmt "github.com/Lateks/cotsworth/fmt"
 	"math"
 	"strings"
+
+	"github.com/Lateks/cotsworth/cal"
+	fcalFmt "github.com/Lateks/cotsworth/fmt"
 )
+
+type Flags struct {
+	ShowSurroundingMonths int
+}
 
 func displayMonth(monthDate *cal.IFCDate, highlightDate *cal.IFCDate) {
 	monthLines := fcalFmt.MonthToLines(monthDate.Year, monthDate.Month, highlightDate)
@@ -48,7 +53,7 @@ func displayMonths(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IF
 	}
 }
 
-func Execute(args []string) {
-	command := parseArgs(args)
+func Execute(flags *Flags, args []string) {
+	command := parseArgs(flags, args)
 	displayMonths(command.numMonths, command.firstMonth, command.highlightDay)
 }

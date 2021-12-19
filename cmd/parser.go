@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/Lateks/cotsworth/cal"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/Lateks/cotsworth/cal"
 )
 
 type command struct {
@@ -55,7 +56,12 @@ func logArgParseError(err error, arg string) {
 	log.Fatalf("Error parsing argument %s: %s\n", arg, err)
 }
 
-func parseArgs(args []string) *command {
+func parseArgs(flags *Flags, args []string) *command {
+	today := cal.DateAt(time.Now())
+	monthSelection := today
+	highlightDay := today
+	numMonthsToShow := 1 + flags.ShowSurroundingMonths
+
 	argCount := len(args)
 	switch argCount {
 	case 3:
@@ -71,13 +77,8 @@ func parseArgs(args []string) *command {
 		if day, err = parseDay(args[2], month, year); err != nil {
 			logArgParseError(err, args[2])
 		}
-		date := cal.NewIFCDate(year, month, day)
-		command := &command{
-			numMonths:    1,
-			firstMonth:   date,
-			highlightDay: date,
-		}
-		return command
+		monthSelection = cal.NewIFCDate(year, month, day)
+		highlightDay = monthSelection
 	case 2:
 		var year int
 		var month cal.IFCMonth
@@ -88,46 +89,27 @@ func parseArgs(args []string) *command {
 		if month, err = parseMonth(args[1]); err != nil {
 			logArgParseError(err, args[1])
 		}
-		date := cal.NewIFCDate(year, month, 1)
-		command := &command{
-			numMonths:    1,
-			firstMonth:   date,
-			highlightDay: nil,
-		}
-		return command
+		monthSelection = cal.NewIFCDate(year, month, 1)
 	case 1:
-		today := cal.DateAt(time.Now())
-
 		// Try to parse argument as a year.
 		year, err := parseYear(args[0])
 		if err == nil {
-			date := cal.NewIFCDate(year, cal.January, 1)
-			command := &command{
-				numMonths:    cal.MonthsInYear,
-				firstMonth:   date,
-				highlightDay: today,
+			monthSelection = cal.NewIFCDate(year, cal.January, 1)
+			numMonthsToShow = cal.MonthsInYear + flags.ShowSurroundingMonths
+		} else {
+			// Failing that, assume it's a month.
+			month, err := parseMonth(args[0])
+			if err != nil {
+				logArgParseError(err, args[0])
 			}
-			return command
+			monthSelection = cal.NewIFCDate(today.Year, month, 1)
 		}
-
-		// Failing that, assume it's a month.
-		month, err := parseMonth(args[0])
-		if err != nil {
-			logArgParseError(err, args[0])
-		}
-		date := cal.NewIFCDate(today.Year, month, 1)
-		command := &command{
-			numMonths:    1,
-			firstMonth:   date,
-			highlightDay: today,
-		}
-		return command
 	}
 
-	today := cal.DateAt(time.Now())
+	startMonth := monthSelection.MinusMonths(flags.ShowSurroundingMonths / 2)
 	return &command{
-		numMonths:    1,
-		firstMonth:   today,
-		highlightDay: today,
+		numMonths:    numMonthsToShow,
+		firstMonth:   startMonth,
+		highlightDay: highlightDay,
 	}
 }
