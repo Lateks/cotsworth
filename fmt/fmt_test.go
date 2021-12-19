@@ -42,13 +42,15 @@ func TestCentering(t *testing.T) {
 }
 func TestMonthFormatting(t *testing.T) {
 	for i, input := range []struct {
-		year   int
-		month  cal.IFCMonth
-		result []string
+		year         int
+		month        cal.IFCMonth
+		highlightDay *cal.IFCDate
+		result       []string
 	}{
 		{
 			2021,
 			cal.January,
+			nil,
 			[]string{
 				"      January 2021      ",
 				"Su Mo Tu We Th Fr Sa    ",
@@ -56,23 +58,27 @@ func TestMonthFormatting(t *testing.T) {
 				" 8  9 10 11 12 13 14    ",
 				"15 16 17 18 19 20 21    ",
 				"22 23 24 25 26 27 28    ",
+				"                        ",
 			},
 		},
 		{
 			2020, // Leap year
 			cal.June,
+			cal.NewIFCDate(2020, cal.June, 29),
 			[]string{
 				"       June 2020        ",
 				"Su Mo Tu We Th Fr Sa LD ",
 				" 1  2  3  4  5  6  7    ",
 				" 8  9 10 11 12 13 14    ",
 				"15 16 17 18 19 20 21    ",
-				"22 23 24 25 26 27 28 29 ",
+				"22 23 24 25 26 27 28 \033[7m29\033[0m ",
+				"                        ",
 			},
 		},
 		{
 			2021, // Not a leap year
 			cal.June,
+			cal.NewIFCDate(2021, cal.July, 1),
 			[]string{
 				"       June 2021        ",
 				"Su Mo Tu We Th Fr Sa    ",
@@ -80,22 +86,25 @@ func TestMonthFormatting(t *testing.T) {
 				" 8  9 10 11 12 13 14    ",
 				"15 16 17 18 19 20 21    ",
 				"22 23 24 25 26 27 28    ",
+				"                        ",
 			},
 		},
 		{
 			2021,
 			cal.December,
+			cal.NewIFCDate(2021, cal.December, 19),
 			[]string{
 				"     December 2021      ",
 				"Su Mo Tu We Th Fr Sa YD ",
 				" 1  2  3  4  5  6  7    ",
 				" 8  9 10 11 12 13 14    ",
-				"15 16 17 18 19 20 21    ",
+				"15 16 17 18 \033[7m19\033[0m 20 21    ",
 				"22 23 24 25 26 27 28 29 ",
+				"                        ",
 			},
 		},
 	} {
-		monthFormatting := fmt.MonthToLines(input.year, input.month)
+		monthFormatting := fmt.MonthToLines(input.year, input.month, input.highlightDay)
 		lineCount := int(math.Min(float64(len(monthFormatting)), float64(len(input.result))))
 
 		for j := 0; j < lineCount; j++ {

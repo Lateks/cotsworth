@@ -33,28 +33,47 @@ func weekdayHeader(year int, month cal.IFCMonth) string {
 		cal.Saturday.ShortFormat(), eighthDay)
 }
 
-func dayLine(weekNum int, year int, month cal.IFCMonth) string {
+func formatDay(dayNum int, dayToHighlight int) string {
+	if dayNum == dayToHighlight {
+		return fmt.Sprintf("\033[7m%2d\033[0m ", dayNum)
+	}
+	return fmt.Sprintf("%2d ", dayNum)
+}
+
+func dayLine(weekNum int, year int, month cal.IFCMonth, highlightDay int) string {
 	var eighthDay string
 	if weekNum == cal.WeeksInMonth-1 && (month == cal.December || month == cal.June && cal.IsLeapYear(year)) {
-		eighthDay = "29"
+		eighthDay = formatDay(29, highlightDay)
 	} else {
-		eighthDay = "  "
+		eighthDay = "   "
 	}
 
 	startDay := weekNum*7 + 1
-	return fmt.Sprintf("%2d %2d %2d %2d %2d %2d %2d %s ",
-		startDay, startDay+1, startDay+2, startDay+3, startDay+4, startDay+5, startDay+6, eighthDay)
+	result := formatDay(startDay, highlightDay)
+	for day := startDay + 1; day < startDay+cal.DaysInWeek; day++ {
+		result += formatDay(day, highlightDay)
+	}
+	result += eighthDay
+
+	return result
 }
 
-func MonthToLines(year int, month cal.IFCMonth) []string {
-	lines := make([]string, 6)
+func MonthToLines(year int, month cal.IFCMonth, currentDate *cal.IFCDate) []string {
+	lines := make([]string, 7)
 	title := fmt.Sprintf("%s %d", month, year)
 	lines[0] = CenterInField(title, monthWidth)
 	lines[1] = weekdayHeader(year, month)
 
-	for week := 0; week < cal.WeeksInMonth; week++ {
-		lines[week+2] = dayLine(week, year, month)
+	highlightDay := -1
+	if currentDate != nil && currentDate.Year == year && currentDate.Month == month {
+		highlightDay = currentDate.Day
 	}
+
+	for week := 0; week < cal.WeeksInMonth; week++ {
+		lines[week+2] = dayLine(week, year, month, highlightDay)
+	}
+
+	lines[6] = fmt.Sprintf("%*s", monthWidth, "")
 
 	return lines
 }
