@@ -5,10 +5,11 @@ import (
 )
 
 const (
-	daysInWeek  = 7
-	daysInMonth = 28
-	daysInYear  = 365
-	leapDay     = 6*daysInMonth + 1 // Leap day occurs on June 29.
+	DaysInWeek   = 7
+	DaysInMonth  = 28
+	WeeksInMonth = 4
+	DaysInYear   = 365
+	LeapDayDate  = 6*DaysInMonth + 1 // Leap day occurs on June 29.
 )
 
 type IFCMonth int
@@ -52,7 +53,7 @@ func (m IFCMonth) String() string {
 type Weekday int
 
 const (
-	Sunday = iota
+	Sunday Weekday = iota
 	Monday
 	Tuesday
 	Wednesday
@@ -78,8 +79,24 @@ var longWeekdayNames = []string{
 	"Year Day",
 }
 
+var shortWeekdayNames = []string{
+	"Su",
+	"Mo",
+	"Tu",
+	"We",
+	"Th",
+	"Fr",
+	"Sa",
+	"LD",
+	"YD",
+}
+
 func (wd Weekday) String() string {
 	return longWeekdayNames[wd]
+}
+
+func (wd Weekday) ShortFormat() string {
+	return shortWeekdayNames[wd]
 }
 
 type IFCDate struct {
@@ -90,8 +107,8 @@ type IFCDate struct {
 }
 
 func NewIFCDate(year int, month IFCMonth, day int) *IFCDate {
-	dayOfYear := (int(month)-1)*daysInMonth + day
-	if isLeapYear(year) && month > June {
+	dayOfYear := (int(month)-1)*DaysInMonth + day
+	if IsLeapYear(year) && month > June {
 		dayOfYear++
 	}
 
@@ -123,7 +140,7 @@ func (d *IFCDate) Weekday() Weekday {
 		return YearDay
 	}
 
-	weekday := (d.Day - 1) % daysInWeek
+	weekday := (d.Day - 1) % DaysInWeek
 	return Weekday(weekday)
 }
 
@@ -137,7 +154,7 @@ func DateAt(t time.Time) *IFCDate {
 	}
 }
 
-func isLeapYear(year int) bool {
+func IsLeapYear(year int) bool {
 	if year%100 == 0 && year%400 != 0 {
 		return false
 	}
@@ -150,27 +167,27 @@ func date(t time.Time) (year int, month IFCMonth, day int, dayOfYear int) {
 	dayOfGregorianYear := t.YearDay()
 	dayOfYear = dayOfGregorianYear
 
-	if isLeapYear(year) {
-		if dayOfGregorianYear == leapDay {
+	if IsLeapYear(year) {
+		if dayOfGregorianYear == LeapDayDate {
 			month = June
 			day = 29
 			return
 		}
 
 		// Ignore leap day after it has gone by.
-		if dayOfGregorianYear > leapDay {
+		if dayOfGregorianYear > LeapDayDate {
 			dayOfGregorianYear--
 		}
 	}
 
-	if dayOfGregorianYear == daysInYear {
+	if dayOfGregorianYear == DaysInYear {
 		// Handle year day
 		month = December
 		day = 29
 	} else {
-		monthOrdinal := dayOfGregorianYear / daysInMonth
+		monthOrdinal := dayOfGregorianYear / DaysInMonth
 		month = IFCMonth(monthOrdinal + 1)
-		day = dayOfGregorianYear - monthOrdinal*daysInMonth
+		day = dayOfGregorianYear - monthOrdinal*DaysInMonth
 	}
 	return
 }
