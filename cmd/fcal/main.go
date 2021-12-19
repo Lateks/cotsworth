@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/Lateks/cotsworth/cmd"
 )
 
 func main() {
@@ -12,10 +11,10 @@ func main() {
 	flag.BoolVar(&gregorian, "g", false, "parse the parameters as Gregorian calendar date (requires year, month and day parameters)")
 	flag.Parse()
 
-	flags := &cmd.Flags{
+	flags := &Flags{
 		ParseGregorian:        gregorian,
 		ShowSurroundingMonths: monthsToDisplay - 1,
 	}
 
-	cmd.Execute(flags, flag.Args())
+	Execute(flags, flag.Args())
 }

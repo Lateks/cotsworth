@@ -7,7 +7,12 @@ import (
 	"github.com/Lateks/cotsworth/cal"
 )
 
-func TestUTCDates(t *testing.T) {
+func TestIFCDateConversion(t *testing.T) {
+	tzHelsinki, err := time.LoadLocation("Europe/Helsinki")
+	if err != nil {
+		t.Fatalf("Error loading Helsinki timezone")
+	}
+
 	for i, input := range []struct {
 		time    time.Time
 		ifcDate *cal.IFCDate
@@ -31,6 +36,10 @@ func TestUTCDates(t *testing.T) {
 		{
 			time.Date(2021, time.December, 31, 12, 00, 0, 0, time.UTC),
 			cal.NewIFCDate(2021, cal.December, 29),
+		},
+		{
+			time.Date(2021, time.January, 1, 1, 00, 0, 0, tzHelsinki),
+			cal.NewIFCDate(2021, cal.January, 1),
 		},
 	} {
 		date := cal.DateAt(input.time)

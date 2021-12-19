@@ -1,5 +1,8 @@
-build:
-	@go build -o fcal .
+fcal:
+	@go build ./cmd/fcal
+
+install:
+	@go install ./cmd/fcal
 
 clean:
 	rm fcal
