@@ -9,6 +9,7 @@ const (
 	DaysInMonth  = 28
 	WeeksInMonth = 4
 	DaysInYear   = 365
+	MonthsInYear = 13
 	LeapDayDate  = 6*DaysInMonth + 1 // Leap day occurs on June 29.
 )
 
@@ -30,7 +31,7 @@ const (
 	December
 )
 
-var longMonthNames = []string{
+var LongMonthNames = []string{
 	"January",
 	"February",
 	"March",
@@ -47,7 +48,7 @@ var longMonthNames = []string{
 }
 
 func (m IFCMonth) String() string {
-	return longMonthNames[int(m)-1]
+	return LongMonthNames[int(m)-1]
 }
 
 type Weekday int
