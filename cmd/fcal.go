@@ -10,6 +10,7 @@ import (
 )
 
 type Flags struct {
+	ParseGregorian        bool
 	ShowSurroundingMonths int
 }
 
