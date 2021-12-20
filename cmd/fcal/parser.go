@@ -11,9 +11,10 @@ import (
 )
 
 type command struct {
-	numMonths    int
-	firstMonth   *cal.IFCDate
-	highlightDay *cal.IFCDate
+	numMonths               int
+	firstMonth              *cal.IFCDate
+	highlightDay            *cal.IFCDate
+	showRelationToGregorian bool
 }
 
 func parseYear(arg string) (int, error) {
@@ -175,8 +176,9 @@ func parseArgs(flags *Flags, args []string) *command {
 
 	startMonth := monthSelection.MinusMonths(flags.ShowSurroundingMonths / 2)
 	return &command{
-		numMonths:    numMonthsToShow,
-		firstMonth:   startMonth,
-		highlightDay: highlightDay,
+		numMonths:               numMonthsToShow,
+		firstMonth:              startMonth,
+		highlightDay:            highlightDay,
+		showRelationToGregorian: flags.ShowRelationToGregorian,
 	}
 }

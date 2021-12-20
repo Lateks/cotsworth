@@ -46,6 +46,13 @@ func TestIFCDateConversion(t *testing.T) {
 		if !date.Equal(input.ifcDate) {
 			t.Errorf("%d: Expected %+v but found %+v\n", i, input.ifcDate, date)
 		}
+
+		timeStamp := date.ToUTCTime()
+		y, m, d := input.time.Date()
+		dateWithoutTime := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+		if !timeStamp.Equal(dateWithoutTime) {
+			t.Errorf("%d: Expected %+v but found %+v\n", i, dateWithoutTime, timeStamp)
+		}
 	}
 }
 

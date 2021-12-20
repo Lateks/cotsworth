@@ -10,8 +10,9 @@ import (
 )
 
 type Flags struct {
-	ParseGregorian        bool
-	ShowSurroundingMonths int
+	ParseGregorian          bool
+	ShowSurroundingMonths   int
+	ShowRelationToGregorian bool
 }
 
 func displayMonth(monthDate *cal.IFCDate, highlightDate *cal.IFCDate) {
@@ -43,9 +44,16 @@ func displayMonthsOnLine(numMonths int, startMonth *cal.IFCDate, highlightDate *
 	}
 }
 
+func displayMonthWithGregorianCal(month *cal.IFCDate, highlightDate *cal.IFCDate) {
+	lines := fcalFmt.MonthToLinesWithGregorian(month.Year, month.Month, highlightDate)
+	for _, line := range lines {
+		fmt.Println(line)
+	}
+}
+
 const maxMonthsPerLine = 3
 
-func displayMonths(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IFCDate) {
+func displayCompactCalendar(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IFCDate) {
 	for numMonths > 0 {
 		monthsToDisplay := int(math.Min(maxMonthsPerLine, float64(numMonths)))
 		displayMonthsOnLine(monthsToDisplay, startMonth, highlightDate)
@@ -54,7 +62,18 @@ func displayMonths(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IF
 	}
 }
 
+func displayRelationToGregorian(numMonths int, startMonth *cal.IFCDate, highlightDate *cal.IFCDate) {
+	for month := 0; month < numMonths; month++ {
+		displayMonthWithGregorianCal(startMonth.PlusMonths(month), highlightDate)
+		fmt.Println()
+	}
+}
+
 func Execute(flags *Flags, args []string) {
 	command := parseArgs(flags, args)
-	displayMonths(command.numMonths, command.firstMonth, command.highlightDay)
+	if command.showRelationToGregorian {
+		displayRelationToGregorian(command.numMonths, command.firstMonth, command.highlightDay)
+	} else {
+		displayCompactCalendar(command.numMonths, command.firstMonth, command.highlightDay)
+	}
 }

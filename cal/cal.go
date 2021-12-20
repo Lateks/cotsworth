@@ -6,11 +6,11 @@ import (
 
 const (
 	DaysInWeek   = 7
-	DaysInMonth  = 28
+	daysInMonth  = 28
 	WeeksInMonth = 4
 	DaysInYear   = 365
 	MonthsInYear = 13
-	LeapDayDate  = 6*DaysInMonth + 1 // Leap day occurs on June 29.
+	LeapDayDate  = 6*daysInMonth + 1 // Leap day occurs on June 29.
 )
 
 type IFCMonth int
@@ -120,7 +120,7 @@ type IFCDate struct {
 }
 
 func NewIFCDate(year int, month IFCMonth, day int) *IFCDate {
-	dayOfYear := (int(month)-1)*DaysInMonth + day
+	dayOfYear := (int(month)-1)*daysInMonth + day
 	if IsLeapYear(year) && month > June {
 		dayOfYear++
 	}
@@ -131,6 +131,11 @@ func NewIFCDate(year int, month IFCMonth, day int) *IFCDate {
 		Day:       day,
 		dayOfYear: dayOfYear,
 	}
+}
+
+func (d *IFCDate) ToUTCTime() time.Time {
+	date := time.Date(d.Year, time.January, 1, 0, 0, 0, 0, time.UTC)
+	return date.Add(time.Duration(d.dayOfYear-1) * 24 * time.Hour)
 }
 
 func (d *IFCDate) Equal(other *IFCDate) bool {
@@ -227,9 +232,21 @@ func date(t time.Time) (year int, month IFCMonth, day int, dayOfYear int) {
 		month = December
 		day = 29
 	} else {
-		monthOrdinal := dayOfGregorianYear / DaysInMonth
+		monthOrdinal := dayOfGregorianYear / daysInMonth
 		month = IFCMonth(monthOrdinal + 1)
-		day = dayOfGregorianYear - monthOrdinal*DaysInMonth
+		day = dayOfGregorianYear - monthOrdinal*daysInMonth
 	}
 	return
+}
+
+func DaysInMonth(year int, month IFCMonth) int {
+	switch month {
+	case June:
+		if IsLeapYear(year) {
+			return 29
+		}
+	case December:
+		return 29
+	}
+	return 28
 }

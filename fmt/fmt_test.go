@@ -119,3 +119,79 @@ func TestMonthFormatting(t *testing.T) {
 		}
 	}
 }
+
+func TestMonthFormattingWithGregorian(t *testing.T) {
+	for i, input := range []struct {
+		year         int
+		month        cal.IFCMonth
+		highlightDay *cal.IFCDate
+		result       []string
+	}{
+		{
+			2022,
+			cal.January,
+			nil,
+			[]string{
+				"January 2022",
+				"Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa    ",
+				" 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 ",
+				" 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 ",
+				"Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr ",
+				"January                                                                             ",
+			},
+		},
+		{
+			2022,
+			cal.February,
+			nil,
+			[]string{
+				"February 2022",
+				"Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa    ",
+				" 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 ",
+				"29 30 31  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 ",
+				"Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr ",
+				"         February                                                                   ",
+			},
+		},
+		{
+			2022,
+			cal.March,
+			nil,
+			[]string{
+				"March 2022",
+				"Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa    ",
+				" 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 ",
+				"26 27 28  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 ",
+				"Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr ",
+				"         March                                                                      ",
+			},
+		},
+		{
+			2021,
+			cal.December,
+			nil,
+			[]string{
+				"December 2021",
+				"Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa YD ",
+				" 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 ",
+				" 3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 ",
+				"Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr Sa Su Mo Tu We Th Fr ",
+				"",
+			},
+		},
+	} {
+		monthFormatting := fmt.MonthToLinesWithGregorian(input.year, input.month, input.highlightDay)
+		lineCount := int(math.Min(float64(len(monthFormatting)), float64(len(input.result))))
+
+		for j := 0; j < lineCount; j++ {
+			if input.result[j] != monthFormatting[j] {
+				t.Errorf("%d: Expected '%s' but found '%s'\n", i, input.result[j], monthFormatting[j])
+			}
+		}
+
+		if len(input.result) != len(monthFormatting) {
+			t.Errorf("%d: Expected %d lines in result but found %d (was: %+v)\n",
+				i, len(input.result), len(monthFormatting), monthFormatting)
+		}
+	}
+}
