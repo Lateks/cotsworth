@@ -1,4 +1,4 @@
-fcal:
+fcal: **/*.go
 	@go build ./cmd/fcal
 
 install:
