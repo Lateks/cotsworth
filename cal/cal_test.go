@@ -34,6 +34,10 @@ func TestIFCDateConversion(t *testing.T) {
 			cal.NewIFCDate(2020, cal.Sol, 1),
 		},
 		{
+			time.Date(2021, time.December, 30, 9, 00, 0, 0, time.UTC),
+			cal.NewIFCDate(2021, cal.December, 28),
+		},
+		{
 			time.Date(2021, time.December, 31, 12, 00, 0, 0, time.UTC),
 			cal.NewIFCDate(2021, cal.December, 29),
 		},

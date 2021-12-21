@@ -232,7 +232,7 @@ func date(t time.Time) (year int, month IFCMonth, day int, dayOfYear int) {
 		month = December
 		day = 29
 	} else {
-		monthOrdinal := dayOfGregorianYear / daysInMonth
+		monthOrdinal := (dayOfGregorianYear - 1) / daysInMonth
 		month = IFCMonth(monthOrdinal + 1)
 		day = dayOfGregorianYear - monthOrdinal*daysInMonth
 	}
