@@ -1,6 +1,7 @@
 package cal
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -48,7 +49,10 @@ var LongMonthNames = []string{
 }
 
 func (m IFCMonth) String() string {
-	return LongMonthNames[int(m)-1]
+	if m > 0 && m <= MonthsInYear {
+		return LongMonthNames[int(m)-1]
+	}
+	return fmt.Sprintf("%%!IFCMonth(%d)", int(m))
 }
 
 func toIFCMonth(zeroBasedVal int) IFCMonth {
@@ -105,11 +109,19 @@ var shortWeekdayNames = []string{
 }
 
 func (wd Weekday) String() string {
-	return longWeekdayNames[wd]
+	if wd >= 0 && wd < 9 {
+		return longWeekdayNames[wd]
+	}
+
+	return fmt.Sprintf("%%!Weekday(%d)", int(wd))
 }
 
 func (wd Weekday) ShortFormat() string {
-	return shortWeekdayNames[wd]
+	if wd >= 0 && wd < 8 {
+		return shortWeekdayNames[wd]
+	}
+
+	return fmt.Sprintf("%%!Weekday(%d)", int(wd))
 }
 
 type IFCDate struct {
